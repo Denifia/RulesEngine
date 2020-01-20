@@ -1,13 +1,11 @@
 ﻿using RulesEngineDemo.DataProviders;
 using RulesEngineDemo.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 
 namespace RulesEngineDemo.Rules
 {
-	public class NameOnBankAccountMustMatchCustomerNameV1 : RuleDefinitionBase
+	public class NameOnBankAccountMustMatchCustomerNameV1 : RuleDefinition
 	{
 		[Serializable]
 		public class Parameters : IParameters
@@ -21,15 +19,9 @@ namespace RulesEngineDemo.Rules
 		[Serializable]
 		public class Inputs : IInputs
 		{
-			public string BankAccountName { get; private set; }
+			public string BankAccountName { get; set; }
 
-			public string CustomerName { get; private set; }
-
-			public Inputs(string bankAccountName, string customerName)
-			{
-				BankAccountName = bankAccountName;
-				CustomerName = customerName;
-			}
+			public string CustomerName { get; set; }
 
 			public bool IsValid()
 			{
@@ -37,26 +29,32 @@ namespace RulesEngineDemo.Rules
 			}
 		}
 
-		public override string Name => "Name must match";
+		public override string Name => typeof(NameOnBankAccountMustMatchCustomerNameV1).Name;
 		public override string Description => "yeah it does!";
 
-		internal new Parameters _parameters { get; set; }
-		internal new Inputs _inputs { get; set; }
-
 		public NameOnBankAccountMustMatchCustomerNameV1(IBankAccountProvider bankAccountProvider, ICustomerProvider customerProvider)
+			: base(bankAccountProvider, customerProvider)
 		{
-			_inputs = new Inputs(bankAccountProvider.BankAccount.Name, customerProvider.Customer.Name);
+			// Map Inputs
+			_inputs = new Inputs()
+			{
+				BankAccountName = bankAccountProvider.BankAccount.Name,
+				CustomerName = customerProvider.Customer.Name
+			};
 		}
 
-		public override void Setup(RuleInstance ruleInstance)
+		protected override void DeserializeParameters(string parameters)
 		{
-			_ruleInstance = ruleInstance;
-			_parameters = JsonSerializer.Deserialize<Parameters>(ruleInstance.Parameters);
+			// Map Parameters
+			_parameters = JsonSerializer.Deserialize<Parameters>(parameters);
 		}
 
-		public override bool ExecuteInner()
+		protected override bool ExecuteInner()
 		{
-			return _inputs.BankAccountName == _inputs.CustomerName;
+			var inputs = (Inputs)_inputs;
+
+			// Rule Logic
+			return inputs.BankAccountName == inputs.CustomerName;
 		}
 	}
 }

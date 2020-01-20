@@ -49,16 +49,18 @@ namespace RulesEngineDemo.DataProviders
 					Status = RuleStatus.Enabled,
 					RuleDefinition = "RulesEngineDemo.Rules.AgeGreaterThanOrEqualToExpectedV1"
 				}
+				,
+				new RuleInstance
+				{
+					Name = "Bank acocunt name must match",
+					Description = "mhmmm",
+					Parameters = "{}",
+					Version = 1,
+					Status = RuleStatus.Enabled,
+					RuleDefinition = "RulesEngineDemo.Rules.NameOnBankAccountMustMatchCustomerNameV1",
+					OutcomeMessageFormat = "Customer name '{CustomerName}' must match Bank Account name '{BankAccountName}'.",
+				}
 				//,
-				//new RuleInstance
-				//{
-				//	Name = "Bank acocunt name must match",
-				//	Description = "mhmmm",
-				//	Parameters = "{}",
-				//	Version = 1,
-				//	Status = RuleStatus.Enabled,
-				//	RuleDefinition = "RulesEngineDemo.Rules.NameOnBankAccountMustMatchCustomerNameV1"
-				//},
 				//new RuleInstance
 				//{
 				//	Name = "Income must be over something per week",

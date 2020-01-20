@@ -5,6 +5,7 @@ using RulesEngineDemo.DataProviders;
 using RulesEngineDemo.Framework;
 using RulesEngineDemo.Models;
 using System;
+using System.Collections.Generic;
 
 namespace RulesEngineDemo
 {
@@ -41,29 +42,44 @@ namespace RulesEngineDemo
             var customerProvider = serviceProvider.GetService<ICustomerProvider>();
             customerProvider.Setup(application, x => x.Customer);
             var ageProvider = serviceProvider.GetService<IAgeProvider>();
-            ageProvider.Setup(application, x => x.Age);
+            //ageProvider.Setup(application, x => x.Age);
             var incomeProvider = serviceProvider.GetService<IIncomeProvider>();
             incomeProvider.Setup(application, x => x.Income);
 
             // Get all the rules
             var rulesProvider = serviceProvider.GetService<IRulesProvider>();
-            var rules = rulesProvider.GetRules();
-
+            
             // Run all the rules
-            foreach (var rule in rules)
-            {
-                var outcome = rule.Execute();
-                logger.LogInformation("{result}: {message}", outcome.Passed ? "Passed" : "Failed", outcome.Message);
-            }
+            logger.LogInformation("Attempt 1...");
+            var rules = rulesProvider.GetRules();
+            RunRules(logger, rules);
+
+            // Fetch more data...
+            ageProvider.Setup(application, x => x.Age);
+
+            // Run all the rules, again
+            Console.WriteLine();
+            logger.LogInformation("Attempt 2...");
+            rules = rulesProvider.GetRules();
+            RunRules(logger, rules);
+
             logger.LogInformation("Done!");
             Console.ReadKey();
 
-            // TODO: Add rule outcomes and "friendly messages".
-            // TODO: Add rule tags to signify which rules to run based on the info we have... 
-            // ...or just run all rules and use inconclusives
-            // ...and query the internal application model to see what data we need to collect or not
-            // TODO: How to run against partial applications?
             // TODO: Update the class diagram to match current implementation
+        }
+
+        private static void RunRules(ILogger<Program> logger, IEnumerable<RuleDefinition> rules)
+        {
+            foreach (var rule in rules)
+            {
+                var outcome = rule.Execute();
+                logger.LogInformation("{RuleName} - {description}\n\t{result}: {message}",
+                    rule.Name,
+                    rule.Description,
+                    outcome.Result.ToString(),
+                    outcome.Message);
+            }
         }
     }
 }

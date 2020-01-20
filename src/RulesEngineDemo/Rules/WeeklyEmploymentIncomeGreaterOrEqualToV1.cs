@@ -1,48 +1,60 @@
 ﻿using RulesEngineDemo.DataProviders;
 using RulesEngineDemo.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 
 namespace RulesEngineDemo.Rules
 {
- //   public class WeeklyEmploymentIncomeGreaterOrEqualToV1 : RuleDefinition
-	//{
-	//	public class Parameters
-	//	{
-	//		public int ExpectedIncomePerWeek { get; set; }
-	//	}
+	public class WeeklyEmploymentIncomeGreaterOrEqualToV1 : RuleDefinition
+	{
+		[Serializable]
+		public class Parameters : IParameters
+		{
+			public int ExpectedIncomePerWeek { get; set; }
 
-	//	public class Inputs
-	//	{
-	//		public int IncomePerWeek { get; private set; }
+			public bool IsValid()
+			{
+				return true;
+			}
+		}
 
-	//		public Inputs(int incomePerWeek)
-	//		{
-	//			IncomePerWeek = incomePerWeek;
-	//		}
-	//	}
+		[Serializable]
+		public class Inputs : IInputs
+		{
+			public int IncomePerWeek { get; set; }
 
-	//	public override string Name => "Weekly Employment Income Greater Or Equal To V1";
-	//	public override string Description => "arstart";
+			public bool IsValid()
+			{
+				return true;
+			}
+		}
 
-	//	private Parameters _parameters;
-	//	private Inputs _inputs;
+		public override string Name => typeof(WeeklyEmploymentIncomeGreaterOrEqualToV1).Name;
+		public override string Description => "arstart";
 
-	//	public WeeklyEmploymentIncomeGreaterOrEqualToV1(IIncomeProvider incomeProvider)
-	//	{
-	//		_inputs = new Inputs(incomeProvider.Income);
-	//	}
+		public WeeklyEmploymentIncomeGreaterOrEqualToV1(IIncomeProvider incomeProvider)
+			: base(incomeProvider)
+		{
+			// Map Inputs
+			_inputs = new Inputs()
+			{
+				IncomePerWeek = incomeProvider.Income
+			};
+		}
 
-	//	public override void Setup(string parameters)
-	//	{
-	//		_parameters = JsonSerializer.Deserialize<Parameters>(parameters);
-	//	}
+		protected override void DeserializeParameters(string parameters)
+		{
+			// Map Parameters
+			_parameters = JsonSerializer.Deserialize<Parameters>(parameters);
+		}
 
-	//	public override bool Execute()
-	//	{
-	//		return _inputs.IncomePerWeek >= _parameters.ExpectedIncomePerWeek;
-	//	}
-	//}
+		protected override bool ExecuteInner()
+		{
+			var inputs = (Inputs)_inputs;
+			var parameters = (Parameters)_parameters;
+
+			// Rule Logic
+			return inputs.IncomePerWeek >= parameters.ExpectedIncomePerWeek;
+		}
+	}
 }

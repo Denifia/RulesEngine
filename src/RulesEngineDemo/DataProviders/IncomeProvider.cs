@@ -1,13 +1,17 @@
-﻿using System;
+﻿using RulesEngineDemo.Framework;
+using System;
 
 namespace RulesEngineDemo.DataProviders
 {
-    public class IncomeProvider : IIncomeProvider
+    public interface IIncomeProvider : IDataProvider<int>
+    {
+        int Income { get; }
+    }
+
+    public class IncomeProvider : DataProvider<int>, IIncomeProvider
     {
         public int Income { get; private set; }
-        public void Setup(dynamic model, Func<dynamic, int> func)
-        {
+        protected override void SetupInner(dynamic model, Func<dynamic, int> func) =>
             Income = func.Invoke(model);
-        }
     }
 }

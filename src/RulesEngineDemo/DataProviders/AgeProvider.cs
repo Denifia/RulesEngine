@@ -1,13 +1,17 @@
-﻿using System;
+﻿using RulesEngineDemo.Framework;
+using System;
 
 namespace RulesEngineDemo.DataProviders
 {
-    public class AgeProvider : IAgeProvider
+    public interface IAgeProvider : IDataProvider<int>
+    {
+        int Age { get; }
+    }
+
+    public class AgeProvider : DataProvider<int>, IAgeProvider
     {
         public int Age { get; private set; }
-        public void Setup(dynamic model, Func<dynamic, int> ageFunc)
-        {
-            Age = ageFunc.Invoke(model);
-        }
+        protected override void SetupInner(dynamic model, Func<dynamic, int> func) => 
+            Age = func.Invoke(model);
     }
 }

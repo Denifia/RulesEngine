@@ -1,15 +1,18 @@
-﻿using RulesEngineDemo.Models;
+﻿using RulesEngineDemo.Framework;
+using RulesEngineDemo.Models;
 using System;
 
 namespace RulesEngineDemo.DataProviders
 {
+    public interface IBankAccountProvider : IDataProvider<BankAccount>
+    {
+        BankAccount BankAccount { get; }
+    }
 
-    public class BankAccountProvider : IBankAccountProvider
+    public class BankAccountProvider : DataProvider<BankAccount>, IBankAccountProvider
     {
         public BankAccount BankAccount { get; private set; }
-        public void Setup(dynamic model, Func<dynamic, BankAccount> bankAccountFunc)
-        {
-            BankAccount = bankAccountFunc.Invoke(model);
-        }
+        protected override void SetupInner(dynamic model, Func<dynamic, BankAccount> func) => 
+            BankAccount = func.Invoke(model);
     }
 }
